@@ -70,7 +70,7 @@ client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 # (100K TPD) — important since a single chat turn can call the API twice
 # (tool-decision + summary) and history is resent every turn. Swap back to
 # "llama-3.3-70b-versatile" if you need stronger reasoning and have quota.
-MODEL_NAME = "llama-3.1-8b-instant"
+MODEL_NAME = "openai/gpt-oss-120b"
 
 app = Flask(__name__, template_folder=TEMPLATES_DIR)
 CORS(app)
@@ -600,17 +600,17 @@ def chat():
 
         return jsonify({"reply": reply, "listings": listings_out, "actions": actions_out})
 
-    except groq.RateLimitError as exc:
-        print("Groq rate limit hit:", repr(exc))
-        return jsonify({
-            "reply": "NestBot has hit today's free AI quota (Groq's free tier resets "
-                     "daily). Give it a little while and try again, or ask whoever "
-                     "runs the server to switch to a lighter model / upgrade the tier "
-                     "in the meantime.",
-            "listings": [],
-        }), 200
         except Exception as exc:
         app.logger.exception("NestBot AI request failed")
+
+        return jsonify({
+            "reply": (
+                "Sorry, NestBot couldn't process your request "
+                "right now. Please try again shortly."
+            ),
+            "listings": [],
+            "actions": []
+        }), 200
 
         return jsonify({
             "reply": (
