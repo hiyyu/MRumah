@@ -609,12 +609,16 @@ def chat():
                      "in the meantime.",
             "listings": [],
         }), 200
-    except Exception as exc:
-        print("Groq API error:", repr(exc))
+        except Exception as exc:
+        app.logger.exception("NestBot AI request failed")
+
         return jsonify({
-            "reply": "Sorry, I'm having trouble reaching my AI service right now. "
-                     "Please check the PyCharm console for the error and try again shortly.",
+            "reply": (
+                "Sorry, NestBot couldn't process your request "
+                "right now. Please try again shortly."
+            ),
             "listings": [],
+            "actions": []
         }), 200
 
 
