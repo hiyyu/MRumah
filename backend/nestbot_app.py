@@ -63,7 +63,7 @@ if not GROQ_API_KEY:
         "script (see .env.example) with:\n    GROQ_API_KEY=your_key_here\n"
     )
 
-client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+client = Groq(api_key=GROQ_API_KEY)
 
 # llama-3.1-8b-instant also supports tool/function calling on Groq, and has a
 # much higher free-tier daily token budget (500K TPD) than the 70b model
@@ -600,25 +600,21 @@ def chat():
 
         return jsonify({"reply": reply, "listings": listings_out, "actions": actions_out})
 
-        except Exception as exc:
-        app.logger.exception("NestBot AI request failed")
-
+    except groq.RateLimitError as exc:
+        print("Groq rate limit hit:", repr(exc))
         return jsonify({
-            "reply": (
-                "Sorry, NestBot couldn't process your request "
-                "right now. Please try again shortly."
-            ),
+            "reply": "NestBot has hit today's free AI quota (Groq's free tier resets "
+                     "daily). Give it a little while and try again, or ask whoever "
+                     "runs the server to switch to a lighter model / upgrade the tier "
+                     "in the meantime.",
             "listings": [],
-            "actions": []
         }), 200
-
+    except Exception as exc:
+        print("Groq API error:", repr(exc))
         return jsonify({
-            "reply": (
-                "Sorry, NestBot couldn't process your request "
-                "right now. Please try again shortly."
-            ),
+            "reply": "Sorry, I'm having trouble reaching my AI service right now. "
+                     "Please check the PyCharm console for the error and try again shortly.",
             "listings": [],
-            "actions": []
         }), 200
 
 
