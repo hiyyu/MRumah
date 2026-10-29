@@ -63,7 +63,7 @@ if not GROQ_API_KEY:
         "script (see .env.example) with:\n    GROQ_API_KEY=your_key_here\n"
     )
 
-client = Groq(api_key=GROQ_API_KEY)
+client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 # llama-3.1-8b-instant also supports tool/function calling on Groq, and has a
 # much higher free-tier daily token budget (500K TPD) than the 70b model
